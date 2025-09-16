@@ -7,6 +7,7 @@ import pandas as pd
 import faiss
 from openai import OpenAI
 from tenacity import retry, wait_exponential, stop_after_attempt, retry_if_exception_type
+from huggingface_hub import hf_hub_download
 from dotenv import load_dotenv
 
 # =====================
@@ -27,21 +28,25 @@ DECOMPOSE_MODEL = os.getenv("DECOMPOSE_MODEL", "gpt-4o-mini")
 ANSWER_MODEL = os.getenv("ANSWER_MODEL", "gpt-4o-mini")
 
 # =====================
-# File Paths
+# Hugging Face files
 # =====================
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-INDEX_FILE = os.getenv("FAISS_INDEX_FILE", os.path.join(BASE_DIR, "data", "drug_embeddings.faiss"))
-METADATA_FILE = os.getenv("METADATA_FILE", os.path.join(BASE_DIR, "data", "drug_chunks_metadata.csv"))
+HF_REPO = "PotatoUmair/drug-rag-data1"  # change if you upload to another repo
+
+def download_file(filename: str) -> str:
+    """Download file from Hugging Face Hub and return local path."""
+    LOGGER.info("Downloading %s from Hugging Face Hub...", filename)
+    path = hf_hub_download(repo_id=HF_REPO, filename=filename)
+    LOGGER.info("Downloaded %s to %s", filename, path)
+    return path
+
+INDEX_FILE = download_file("drug_embeddings.faiss")
+METADATA_FILE = download_file("drug_chunks_metadata.csv")
+# Optional: If you ever use embeddings.npy
+# EMBEDDINGS_FILE = download_file("embedding.npy")
 
 # =====================
 # Load FAISS + Metadata
 # =====================
-if not os.path.exists(INDEX_FILE) or not os.path.exists(METADATA_FILE):
-    raise FileNotFoundError(
-        f"FAISS index or metadata file not found.\n"
-        f"Looking for:\n- {INDEX_FILE}\n- {METADATA_FILE}"
-    )
-
 LOGGER.info("Loading FAISS index from %s", INDEX_FILE)
 _index = faiss.read_index(INDEX_FILE)
 
@@ -63,7 +68,6 @@ retry_decorator = retry(
 # =====================
 @retry_decorator
 def _create_embedding(text: str) -> np.ndarray:
-    """Return embedding vector as numpy float32 array."""
     resp = client.embeddings.create(model=EMBEDDING_MODEL, input=text)
     emb = np.array(resp.data[0].embedding, dtype="float32")
     return emb
@@ -73,7 +77,6 @@ def _create_embedding(text: str) -> np.ndarray:
 # =====================
 @retry_decorator
 def _llm_chat_completion(prompt: str, model: str, temperature: float = 0.0) -> str:
-    """Call chat completion with retries and return content string."""
     resp = client.chat.completions.create(
         model=model,
         messages=[{"role": "user", "content": prompt}],
@@ -85,7 +88,6 @@ def _llm_chat_completion(prompt: str, model: str, temperature: float = 0.0) -> s
 # Pipeline Steps
 # =====================
 def decompose_query(user_query: str, max_subqueries: int = 5) -> List[str]:
-    """Split user query into independent sub-questions using an LLM."""
     prompt = f"""
 You are an expert in drug information. Split the following user query into up to {max_subqueries} independent sub-questions.
 Return each sub-question on a separate line.
@@ -101,7 +103,6 @@ User query: "{user_query}"
         return [user_query]
 
 def retrieve_chunks(query_text: str, top_k: int = 3) -> List[Dict]:
-    """Return top_k nearest chunks from FAISS with distances and metadata."""
     try:
         emb = _create_embedding(query_text)
     except Exception as exc:
@@ -125,10 +126,8 @@ def retrieve_chunks(query_text: str, top_k: int = 3) -> List[Dict]:
     return results
 
 def generate_answer(sub_query: str, chunks: List[Dict]) -> str:
-    """Generate constrained answer using retrieved chunks only."""
     if not chunks:
         return "No relevant information found."
-
     prompt_chunks = "\n\n".join([f"Chunk: {c['text']}" for c in chunks])
     prompt = f"""
 You are a medical expert. Answer the question below using ONLY the information from the retrieved chunks.
@@ -146,7 +145,6 @@ Answer:
         return "Error generating answer."
 
 def combine_answers(user_query: str, sub_query_answers: List[Dict]) -> str:
-    """Combine sub-query answers into a single coherent final answer."""
     combined_text = "\n".join([f"{i+1}. {a['answer']}" for i, a in enumerate(sub_query_answers)])
     prompt = f"""
 You are a medical expert. The user asked the following question:
@@ -167,7 +165,6 @@ Final Answer:
         return "Error generating final answer."
 
 def query_pipeline(user_query: str, top_k: int = 3, max_subqueries: int = 5) -> Tuple[str, List[Dict]]:
-    """Run decomposition -> retrieval -> per-sub-query answer -> combine."""
     sub_queries = decompose_query(user_query, max_subqueries=max_subqueries)
     answers = []
     for sq in sub_queries:
