@@ -34,9 +34,11 @@ HF_REPO = "PotatoUmair/drug-rag-data1"  # change if you upload to another repo
 
 def download_file(filename: str) -> str:
     """Download file from Hugging Face Hub and return local path."""
-    LOGGER.info("Downloading %s from Hugging Face Hub...", filename)
-    path = hf_hub_download(repo_id=HF_REPO, filename=filename)
-    LOGGER.info("Downloaded %s to %s", filename, path)
+    path = hf_hub_download(
+        repo_id=HF_REPO,
+        filename=filename,
+        repo_type="dataset"   # 👈 required since this is a dataset repo
+    )
     return path
 
 INDEX_FILE = download_file("drug_embeddings.faiss")
