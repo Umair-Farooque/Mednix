@@ -4,22 +4,34 @@
 let observer;
 
 function initializeObserver() {
-  const observerOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
-  
-  observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        animateLamp(entry.target);
-        observer.unobserve(entry.target);
+  try {
+    const lampContainers = document.querySelectorAll('.lamp-container');
+    if (!lampContainers.length) {
+      console.warn('No lamp containers found');
+      return;
+    }
+
+    const observerOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
+    
+    observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          animateLamp(entry.target);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+    
+    // Observe all lamp containers
+    lampContainers.forEach(container => {
+      if (container) {
+        observer.observe(container);
+        container.style.opacity = '1';
       }
     });
-  }, observerOptions);
-  
-  // Observe all lamp containers
-  document.querySelectorAll('.lamp-container').forEach(container => {
-    observer.observe(container);
-    container.style.opacity = '1';
-  });
+  } catch (error) {
+    console.error('Error initializing observer:', error);
+  }
 }
 
 function animateLamp(container) {
@@ -46,25 +58,41 @@ function animateLamp(container) {
 // Chat UI Class
 // ===============================
 class ChatUI {
+  static isInitialized = false;
   constructor() {
-    this.chatMessages = document.getElementById("chatMessages");
-    this.userInput = document.getElementById("userInput");
-    this.sendButton = document.getElementById("sendButton");
-    this.chatButton = document.getElementById("chatButton");
-    this.chatSection = document.getElementById("chatSection");
-
-    // Check if required elements exist
-    if (!this.chatMessages || !this.userInput || !this.sendButton) {
-      console.warn("⚠️ Some Chat UI elements are missing. Chat not fully initialized.");
+    if (ChatUI.isInitialized) {
+      console.log('ChatUI already initialized');
       return;
     }
 
-    // Initialize only if we have the minimum required elements
-    if (this.chatSection) {
-      this.chatSection.style.display = "none";
-    }
+    try {
+      this.chatMessages = document.getElementById("chatMessages");
+      this.userInput = document.getElementById("userInput");
+      this.sendButton = document.getElementById("sendButton");
+      this.chatButton = document.getElementById("chatButton");
+      this.chatSection = document.getElementById("chatSection");
 
-    this.initializeEventListeners();
+      // Check if required elements exist
+      if (!this.chatMessages || !this.userInput || !this.sendButton) {
+        console.warn("⚠️ Some Chat UI elements are missing. Chat not fully initialized.", {
+          chatMessages: !!this.chatMessages,
+          userInput: !!this.userInput,
+          sendButton: !!this.sendButton
+        });
+        return;
+      }
+
+      // Initialize only if we have the minimum required elements
+      if (this.chatSection) {
+        this.chatSection.style.display = "none";
+      }
+
+      this.initializeEventListeners();
+      ChatUI.isInitialized = true;
+      console.log('ChatUI initialized successfully');
+    } catch (error) {
+      console.error('Error initializing ChatUI:', error);
+    }
   }
 
   initializeEventListeners() {
@@ -168,19 +196,38 @@ class ChatUI {
 // Initialize Application
 // ===============================
 function initializeApp() {
-  // Initialize observer for lamp animations
-  initializeObserver();
-  
-  // Initialize chat UI if the chat section exists
-  if (document.getElementById('chatSection')) {
-    window.chatUI = new ChatUI();
+  try {
+    console.log('Initializing application...');
+    
+    // Initialize observer for lamp animations
+    if (typeof initializeObserver === 'function') {
+      initializeObserver();
+    } else {
+      console.warn('initializeObserver function not found');
+    }
+    
+    // Initialize chat UI if the chat section exists
+    if (document.getElementById('chatSection')) {
+      window.chatUI = new ChatUI();
+    } else {
+      console.warn('Chat section not found in the DOM');
+    }
+    
+    console.log('Application initialized');
+  } catch (error) {
+    console.error('Error initializing application:', error);
   }
 }
 
-// Wait for DOM to be fully loaded
-document.addEventListener('DOMContentLoaded', initializeApp);
+// Make sure the DOM is fully loaded before initializing
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+  // DOM is already ready
+  initializeApp();
+}
 
 // Export ChatUI for global access if using modules
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { ChatUI };
+  module.exports = { ChatUI, initializeApp };
 }

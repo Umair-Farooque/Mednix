@@ -75,22 +75,21 @@
     </div>
   </section>
 
-  <!-- Load external JS with defer to ensure DOM is ready -->
-  <script src="/static/script.js" defer></script>
-  
-  <!-- Initialize the application -->
+  <!-- Load scripts at the end of body -->
   <script>
-    // This is a fallback in case the script fails to load
-    window.addEventListener('load', function() {
-      if (typeof initializeApp === 'function') {
-        initializeApp();
-      } else if (window.chatUI) {
-        // If initializeApp isn't available but chatUI exists, it's already initialized
-        console.log('Chat UI already initialized');
-      } else {
-        console.warn('Failed to initialize application. Script may not have loaded correctly.');
-      }
-    });
+    // Create a script element for our main script
+    const script = document.createElement('script');
+    script.src = '/static/script.js';
+    script.onload = function() {
+      console.log('Script loaded successfully');
+      // The script will handle its own initialization
+    };
+    script.onerror = function() {
+      console.error('Error loading script');
+    };
+    
+    // Add the script to the page
+    document.body.appendChild(script);
   </script>
 </body>
 </html>
