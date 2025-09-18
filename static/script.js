@@ -58,23 +58,27 @@ class ChatUI {
     }
 
     initializeEventListeners() {
-        this.sendButton.addEventListener("click", () =>
-            this.handleSendMessage()
-        );
+        if (this.sendButton) {
+            this.sendButton.addEventListener("click", () =>
+                this.handleSendMessage()
+            );
+        }
 
-        this.userInput.addEventListener("keypress", (e) => {
-            if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                this.handleSendMessage();
-            }
-        });
+        if (this.userInput) {
+            this.userInput.addEventListener("keypress", (e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    this.handleSendMessage();
+                }
+            });
+        }
 
         if (this.chatButton && this.chatSection) {
             this.chatButton.addEventListener("click", (e) => {
                 e.preventDefault();
                 this.chatSection.style.display = "block";
                 this.chatSection.scrollIntoView({ behavior: "smooth" });
-                this.userInput.focus();
+                this.userInput?.focus();
             });
         }
     }
@@ -111,7 +115,7 @@ class ChatUI {
         const response = await fetch("/query", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ query: message }), // ✅ match FastAPI model
+            body: JSON.stringify({ query: message }), // ✅ matches FastAPI model
         });
 
         if (!response.ok) {
@@ -164,6 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Lamp animation observer
     document.querySelectorAll(".lamp-container").forEach((container) => {
         observer.observe(container);
+        container.style.opacity = "1"; // ensure visible
     });
 
     // Chat UI

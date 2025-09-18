@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mednix - Drug Information Assistant</title>
-    <!-- ✅ Hardcoded static file linking -->
+    <!-- ✅ Load CSS -->
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
@@ -74,9 +74,12 @@
         </div>
     </section>
 
-    <!-- Load scripts at the end of body -->
+    <!-- ✅ Load external JS first -->
+    <script src="/static/script.js"></script>
+
+    <!-- ✅ Inline init AFTER script.js is available -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Lamp animations
             const lampContainers = document.querySelectorAll('.lamp-container');
             lampContainers.forEach(container => {
@@ -84,7 +87,9 @@
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
                             setTimeout(() => {
-                                const beams = container.querySelectorAll('.lamp-beam-left, .lamp-beam-right, .lamp-glow-medium, .lamp-light-beam');
+                                const beams = container.querySelectorAll(
+                                    '.lamp-beam-left, .lamp-beam-right, .lamp-glow-medium, .lamp-light-beam'
+                                );
                                 beams.forEach(beam => {
                                     if (beam) beam.classList.add('animate');
                                 });
@@ -97,18 +102,18 @@
                         }
                     });
                 }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-                
+
                 observer.observe(container);
                 container.style.opacity = '1';
             });
 
-            // Chat functionality
-            if (document.getElementById('chatSection')) {
+            // ChatUI initialization (safe)
+            if (document.getElementById('chatSection') && typeof ChatUI !== "undefined") {
                 new ChatUI();
+            } else {
+                console.warn("⚠️ ChatUI not found or chat section missing.");
             }
         });
     </script>
-    <!-- ✅ Hardcoded static file linking -->
-    <script src="/static/script.js"></script>
 </body>
 </html>
