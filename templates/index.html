@@ -1,119 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mednix - Drug Information Assistant</title>
-    <!-- ✅ Load CSS -->
-    <link rel="stylesheet" href="/static/styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mednix - Drug Information Assistant</title>
+  <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
-    <!-- Main Lamp Demo -->
-    <div class="lamp-container">
-        <div class="lamp-effect-wrapper">
-            <div class="lamp-beam-left" id="beamLeft"></div>
-            <div class="lamp-beam-right" id="beamRight"></div>
-            <div class="lamp-blur-bg"></div>
-            <div class="lamp-backdrop"></div>
-            <div class="lamp-glow-large"></div>
-            <div class="lamp-glow-medium" id="glowMedium"></div>
-            <div class="lamp-light-beam" id="lightBeam"></div>
-            <div class="lamp-mask"></div>
-        </div>
-
-        <div class="lamp-content">
-            <h1 class="lamp-title" id="lampTitle">
-                Mednix <br> Drug Information BanK
-            </h1>
-        </div>
+  <!-- Main Lamp Demo -->
+  <div class="lamp-container">
+    <div class="lamp-effect-wrapper">
+      <div class="lamp-beam-left"></div>
+      <div class="lamp-beam-right"></div>
+      <div class="lamp-blur-bg"></div>
+      <div class="lamp-backdrop"></div>
+      <div class="lamp-glow-large"></div>
+      <div class="lamp-glow-medium"></div>
+      <div class="lamp-light-beam"></div>
+      <div class="lamp-mask"></div>
     </div>
-
-    <!-- Custom Colored Lamp -->
-    <div class="lamp-container custom-lamp">
-        <div class="lamp-effect-wrapper">
-            <div class="lamp-beam-left lamp-beam-custom"></div>
-            <div class="lamp-beam-right lamp-beam-custom"></div>
-            <div class="lamp-blur-bg"></div>
-            <div class="lamp-backdrop"></div>
-            <div class="lamp-glow-large"></div>
-            <div class="lamp-glow-medium lamp-glow-custom"></div>
-            <div class="lamp-light-beam lamp-light-custom"></div>
-            <div class="lamp-mask"></div>
-        </div>
-
-        <div class="lamp-content">
-            <h1 class="lamp-title lamp-title-custom">
-                Click to Chat
-            </h1>
-            <button id="chatButton" class="chat-button">Start Chatting</button>
-        </div>
+    <div class="lamp-content">
+      <h1 class="lamp-title">
+        Mednix <br /> Drug Information BanK
+      </h1>
     </div>
+  </div>
 
-    <!-- Chat Section -->
-    <section id="chatSection" class="chat-section">
-        <div class="chat-container">
-            <div class="chat-header">
-                <h2>Mednix Drug Information Assistant</h2>
-                <p>Ask me anything about medications and their effects</p>
-            </div>
-            <div id="chatMessages" class="chat-messages">
-                <!-- Messages will be added here dynamically -->
-                <div class="message bot-message">
-                    Hello! I'm your Mednix assistant. How can I help you with medications today?
-                </div>
-            </div>
-            <div class="chat-input-container">
-                <input type="text" id="userInput" placeholder="Type your question about medications..." class="chat-input">
-                <button id="sendButton" class="send-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                    </svg>
-                </button>
-            </div>
+  <!-- Custom Colored Lamp -->
+  <div class="lamp-container custom-lamp">
+    <div class="lamp-effect-wrapper">
+      <div class="lamp-beam-left lamp-beam-custom"></div>
+      <div class="lamp-beam-right lamp-beam-custom"></div>
+      <div class="lamp-blur-bg"></div>
+      <div class="lamp-backdrop"></div>
+      <div class="lamp-glow-large"></div>
+      <div class="lamp-glow-medium lamp-glow-custom"></div>
+      <div class="lamp-light-beam lamp-light-custom"></div>
+      <div class="lamp-mask"></div>
+    </div>
+    <div class="lamp-content">
+      <h1 class="lamp-title lamp-title-custom">Click to Chat</h1>
+      <button id="chatButton" class="chat-button">Start Chatting</button>
+    </div>
+  </div>
+
+  <!-- Chat Section -->
+  <section id="chatSection" class="chat-section">
+    <div class="chat-container">
+      <div class="chat-header">
+        <h2>Mednix Drug Information Assistant</h2>
+        <p>Ask me anything about medications and their effects</p>
+      </div>
+      <div id="chatMessages" class="chat-messages">
+        <div class="message bot-message">
+          Hello! I'm your Mednix assistant. How can I help you with medications today?
         </div>
-    </section>
+      </div>
+      <div class="chat-input-container">
+        <input
+          type="text"
+          id="userInput"
+          placeholder="Type your question about medications..."
+          class="chat-input"
+        />
+        <button id="sendButton" class="send-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+               viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </section>
 
-    <!-- ✅ Load external JS first -->
-    <script src="/static/script.js"></script>
-
-    <!-- ✅ Inline init AFTER script.js is available -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Lamp animations
-            const lampContainers = document.querySelectorAll('.lamp-container');
-            lampContainers.forEach(container => {
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            setTimeout(() => {
-                                const beams = container.querySelectorAll(
-                                    '.lamp-beam-left, .lamp-beam-right, .lamp-glow-medium, .lamp-light-beam'
-                                );
-                                beams.forEach(beam => {
-                                    if (beam) beam.classList.add('animate');
-                                });
-                            }, 300);
-
-                            setTimeout(() => {
-                                const title = container.querySelector('.lamp-title');
-                                if (title) title.classList.add('animate');
-                            }, 600);
-                        }
-                    });
-                }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-
-                observer.observe(container);
-                container.style.opacity = '1';
-            });
-
-            // ChatUI initialization (safe)
-            if (document.getElementById('chatSection') && typeof ChatUI !== "undefined") {
-                new ChatUI();
-            } else {
-                console.warn("⚠️ ChatUI not found or chat section missing.");
-            }
-        });
-    </script>
+  <!-- ✅ Load external JS -->
+  <script src="/static/script.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      if (document.getElementById("chatSection") && typeof ChatUI !== "undefined") {
+        new ChatUI();
+      } else {
+        console.warn("⚠️ ChatUI not found or chat section missing.");
+      }
+    });
+  </script>
 </body>
 </html>
