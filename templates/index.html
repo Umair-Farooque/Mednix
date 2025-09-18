@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mednix - Drug Information Assistant</title>
-    <!-- Correct static file linking -->
-    <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
+    <!-- ✅ Hardcoded static file linking -->
+    <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
     <!-- Main Lamp Demo -->
@@ -108,6 +108,7 @@
             }
         });
     </script>
-    <script src="{{ url_for('static', path='script.js') }}"></script>
+    <!-- ✅ Hardcoded static file linking -->
+    <script src="/static/script.js"></script>
 </body>
 </html>
