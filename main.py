@@ -71,5 +71,11 @@ def query(request: QueryRequest):
 
 # Frontend route
 @app.get("/", response_class=HTMLResponse)
-def home(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+async def home(request: Request):
+    return templates.TemplateResponse(
+        "index.html",
+        {
+            "request": request,
+            "url_for": request.url_for
+        }
+    )
