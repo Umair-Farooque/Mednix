@@ -21,7 +21,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Templates (for frontend)
 templates = Jinja2Templates(directory="templates")
 
-# CORS (API only – frontend served directly from same origin)
+# CORS
 allowed = os.getenv("ALLOWED_ORIGINS", "")
 if allowed:
     origins = [o.strip() for o in allowed.split(",") if o.strip()]
@@ -44,7 +44,7 @@ class QueryRequest(BaseModel):
 
 class QueryResponse(BaseModel):
     query: str
-    final_answer: str  # removed sub_answers
+    final_answer: str
 
 # Health endpoints
 @app.get("/healthz")
@@ -63,8 +63,8 @@ def query(request: QueryRequest):
 
     LOGGER.info("Received query: %s", request.query[:200])
     final_answer, _ = query_pipeline(
-        request.query, 
-        top_k=request.top_k, 
+        request.query,
+        top_k=request.top_k,
         max_subqueries=request.max_subqueries
     )
     return {"query": request.query, "final_answer": final_answer}
@@ -74,8 +74,5 @@ def query(request: QueryRequest):
 async def home(request: Request):
     return templates.TemplateResponse(
         "index.html",
-        {
-            "request": request,
-            "url_for": request.url_for
-        }
+        {"request": request}   # ✅ only pass request
     )

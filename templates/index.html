@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mednix - Drug Information Assistant</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}">
+    <!-- Correct static file linking -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <!-- Main Lamp Demo -->
@@ -75,16 +76,13 @@
 
     <!-- Load scripts at the end of body -->
     <script>
-        // Initialize the chat UI when the DOM is fully loaded
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize lamp animations
+            // Lamp animations
             const lampContainers = document.querySelectorAll('.lamp-container');
             lampContainers.forEach(container => {
                 const observer = new IntersectionObserver((entries) => {
                     entries.forEach(entry => {
                         if (entry.isIntersecting) {
-                            const container = entry.target;
-                            // Trigger animations with delays
                             setTimeout(() => {
                                 const beams = container.querySelectorAll('.lamp-beam-left, .lamp-beam-right, .lamp-glow-medium, .lamp-light-beam');
                                 beams.forEach(beam => {
@@ -98,23 +96,18 @@
                             }, 600);
                         }
                     });
-                }, {
-                    threshold: 0.1,
-                    rootMargin: '0px 0px -50px 0px'
-                });
+                }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
                 
                 observer.observe(container);
-                
-                // Immediately show the container
                 container.style.opacity = '1';
             });
 
-            // Initialize chat functionality
+            // Chat functionality
             if (document.getElementById('chatSection')) {
                 new ChatUI();
             }
         });
     </script>
-    <script src="{{ url_for('static', path='/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
