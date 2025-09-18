@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mednix - Drug Information Assistant</title>
-  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}" />
 </head>
 <body>
   <!-- Main Lamp Demo -->
@@ -75,21 +75,19 @@
     </div>
   </section>
 
-  <!-- Load scripts at the end of body -->
+  <!-- Load scripts -->
+  <script src="{{ url_for('static', path='/script.js') }}"></script>
   <script>
-    // Create a script element for our main script
-    const script = document.createElement('script');
-    script.src = '/static/script.js';
-    script.onload = function() {
-      console.log('Script loaded successfully');
-      // The script will handle its own initialization
-    };
-    script.onerror = function() {
-      console.error('Error loading script');
-    };
-    
-    // Add the script to the page
-    document.body.appendChild(script);
+    // Fallback initialization if the script doesn't auto-initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof initializeApp === 'function') {
+        initializeApp();
+      } else if (window.chatUI) {
+        console.log('Chat UI already initialized');
+      } else {
+        console.warn('Failed to initialize application');
+      }
+    });
   </script>
 </body>
 </html>
