@@ -75,14 +75,20 @@
     </div>
   </section>
 
-  <!-- ✅ Load external JS -->
-  <script src="/static/script.js"></script>
+  <!-- Load external JS with defer to ensure DOM is ready -->
+  <script src="/static/script.js" defer></script>
+  
+  <!-- Initialize the application -->
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      if (document.getElementById("chatSection") && typeof ChatUI !== "undefined") {
-        new ChatUI();
+    // This is a fallback in case the script fails to load
+    window.addEventListener('load', function() {
+      if (typeof initializeApp === 'function') {
+        initializeApp();
+      } else if (window.chatUI) {
+        // If initializeApp isn't available but chatUI exists, it's already initialized
+        console.log('Chat UI already initialized');
       } else {
-        console.warn("⚠️ ChatUI not found or chat section missing.");
+        console.warn('Failed to initialize application. Script may not have loaded correctly.');
       }
     });
   </script>

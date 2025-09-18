@@ -1,16 +1,26 @@
 // ===============================
 // Lamp Animation
 // ===============================
-const observerOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
+let observer;
 
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach((entry) => {
-    if (entry.isIntersecting) {
-      animateLamp(entry.target);
-      observer.unobserve(entry.target);
-    }
+function initializeObserver() {
+  const observerOptions = { threshold: 0.1, rootMargin: "0px 0px -50px 0px" };
+  
+  observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        animateLamp(entry.target);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+  
+  // Observe all lamp containers
+  document.querySelectorAll('.lamp-container').forEach(container => {
+    observer.observe(container);
+    container.style.opacity = '1';
   });
-}, observerOptions);
+}
 
 function animateLamp(container) {
   if (!container) return;
@@ -43,12 +53,16 @@ class ChatUI {
     this.chatButton = document.getElementById("chatButton");
     this.chatSection = document.getElementById("chatSection");
 
+    // Check if required elements exist
     if (!this.chatMessages || !this.userInput || !this.sendButton) {
-      console.warn("⚠️ Some Chat UI elements are missing. Chat not initialized.");
+      console.warn("⚠️ Some Chat UI elements are missing. Chat not fully initialized.");
       return;
     }
 
-    if (this.chatSection) this.chatSection.style.display = "none";
+    // Initialize only if we have the minimum required elements
+    if (this.chatSection) {
+      this.chatSection.style.display = "none";
+    }
 
     this.initializeEventListeners();
   }
@@ -151,11 +165,22 @@ class ChatUI {
 }
 
 // ===============================
-// DOM Ready
+// Initialize Application
 // ===============================
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".lamp-container").forEach((container) => {
-    observer.observe(container);
-    container.style.opacity = "1";
-  });
-});
+function initializeApp() {
+  // Initialize observer for lamp animations
+  initializeObserver();
+  
+  // Initialize chat UI if the chat section exists
+  if (document.getElementById('chatSection')) {
+    window.chatUI = new ChatUI();
+  }
+}
+
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', initializeApp);
+
+// Export ChatUI for global access if using modules
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { ChatUI };
+}
