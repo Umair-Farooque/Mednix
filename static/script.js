@@ -94,7 +94,7 @@ class ChatUI {
             this.removeTypingIndicator(typingId);
             this.addMessage(
                 "bot",
-                response?.answer ||
+                response?.final_answer ||
                     "I couldn't process your request. Please try again."
             );
         } catch (error) {
@@ -108,10 +108,10 @@ class ChatUI {
     }
 
     async sendToBackend(message) {
-        const response = await fetch("/api/chat", {
+        const response = await fetch("/query", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ question: message }),
+            body: JSON.stringify({ query: message }), // ✅ match FastAPI model
         });
 
         if (!response.ok) {
