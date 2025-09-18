@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mednix - Drug Information Assistant</title>
-  <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}" />
+  <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
   <!-- Main Lamp Demo -->
@@ -75,18 +75,47 @@
     </div>
   </section>
 
-  <!-- Load scripts -->
-  <script src="{{ url_for('static', path='/script.js') }}"></script>
+  <!-- Simple script loading -->
   <script>
-    // Fallback initialization if the script doesn't auto-initialize
-    document.addEventListener('DOMContentLoaded', function() {
-      if (typeof initializeApp === 'function') {
-        initializeApp();
-      } else if (window.chatUI) {
-        console.log('Chat UI already initialized');
+    // Simple DOM ready function
+    function ready(fn) {
+      if (document.readyState !== 'loading') {
+        fn();
       } else {
-        console.warn('Failed to initialize application');
+        document.addEventListener('DOMContentLoaded', fn);
       }
+    }
+
+    // Load CSS
+    function loadCSS(href) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = href;
+      document.head.appendChild(link);
+    }
+
+    // Load JS
+    function loadJS(src, callback) {
+      const script = document.createElement('script');
+      script.src = src;
+      script.onload = callback;
+      document.body.appendChild(script);
+    }
+
+    // When DOM is ready
+    ready(function() {
+      console.log('DOM is ready, loading resources...');
+      
+      // Load CSS
+      loadCSS('/static/styles.css');
+      
+      // Load JS
+      loadJS('/static/script.js', function() {
+        console.log('Script loaded');
+        if (typeof initializeApp === 'function') {
+          setTimeout(initializeApp, 100);
+        }
+      });
     });
   </script>
 </body>

@@ -1,18 +1,15 @@
 import os
 import logging
 import os
-from fastapi import FastAPI, HTTPException, Request
+import os
+from pathlib import Path
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from rag_pipeline import query_pipeline
-from pathlib import Path
 
 # Logging
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
@@ -24,33 +21,69 @@ app = FastAPI(title="Drug RAG API", version="1.0")
 # Get the base directory
 BASE_DIR = Path(__file__).parent
 
+# Ensure static and templates directories exist
+static_dir = BASE_DIR / "static"
+templates_dir = BASE_DIR / "templates"
+
+# Create directories if they don't exist
+static_dir.mkdir(exist_ok=True)
+templates_dir.mkdir(exist_ok=True)
+
 # Templates (for frontend)
-templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+templates = Jinja2Templates(directory=str(templates_dir))
 
 # Serve static files
-app.mount(
-    "/static",
-    StaticFiles(directory=str(BASE_DIR / "static")),
-    name="static"
-)
+app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
 # Add a route to serve the main page
 @app.get("/test-static")
 async def test_static():
     """Test endpoint to verify static files are being served"""
     static_dir = BASE_DIR / "static"
+    css_path = static_dir / "styles.css"
+    js_path = static_dir / "script.js"
+    
     return {
         "static_files_exist": {
-            "styles.css": (static_dir / "styles.css").exists(),
-            "script.js": (static_dir / "script.js").exists()
+            "styles.css": css_path.exists(),
+            "script.js": js_path.exists()
         },
-        "static_dir": str(static_dir.absolute())
+        "static_dir": str(static_dir.absolute()),
+        "files": {
+            "styles.css": str(css_path.absolute()),
+            "script.js": str(js_path.absolute())
+        }
     }
+
+@app.get("/test-css")
+async def test_css():
+    """Test endpoint to serve the CSS file directly"""
+    css_path = static_dir / "styles.css"
+    if not css_path.exists():
+        raise HTTPException(status_code=404, detail="CSS file not found")
+    return FileResponse(css_path)
+
+@app.get("/test-js")
+async def test_js():
+    """Test endpoint to serve the JS file directly"""
+    js_path = static_dir / "script.js"
+    if not js_path.exists():
+        raise HTTPException(status_code=404, detail="JS file not found")
+    return FileResponse(js_path)
 
 @app.get("/")
 async def read_root(request: Request):
     """Serve the main application page"""
-    return templates.TemplateResponse("index.html", {"request": request})
+    # Check if the template exists
+    template_path = templates_dir / "index.html"
+    if not template_path.exists():
+        raise HTTPException(status_code=500, detail="Template not found")
+    
+    # Serve the template
+    return templates.TemplateResponse("index.html", {
+        "request": request,
+        "static_url": "/static"
+    })
 
 # CORS
 allowed = os.getenv("ALLOWED_ORIGINS", "")

@@ -3,6 +3,15 @@
 // ===============================
 let observer;
 
+// Function to check if DOM is ready
+function domReady(callback) {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', callback);
+  } else {
+    callback();
+  }
+}
+
 function initializeObserver() {
   try {
     const lampContainers = document.querySelectorAll('.lamp-container');
@@ -197,6 +206,12 @@ class ChatUI {
 // ===============================
 function initializeApp() {
   try {
+    // Prevent multiple initializations
+    if (window.appInitialized) {
+      console.log('Application already initialized');
+      return;
+    }
+    
     console.log('Initializing application...');
     
     // Initialize observer for lamp animations
@@ -213,19 +228,19 @@ function initializeApp() {
       console.warn('Chat section not found in the DOM');
     }
     
-    console.log('Application initialized');
+    // Set the flag to indicate the app is initialized
+    window.appInitialized = true;
+    console.log('Application initialized successfully');
   } catch (error) {
     console.error('Error initializing application:', error);
   }
 }
 
-// Make sure the DOM is fully loaded before initializing
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initializeApp);
-} else {
-  // DOM is already ready
-  initializeApp();
-}
+// Initialize the application when the DOM is ready
+domReady(function() {
+  // Small delay to ensure all elements are available
+  setTimeout(initializeApp, 100);
+});
 
 // Export ChatUI for global access if using modules
 if (typeof module !== 'undefined' && module.exports) {
