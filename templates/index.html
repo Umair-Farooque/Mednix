@@ -3,23 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drug RAG Assistant</title>
+    <title>Mednix - Drug Information Assistant</title>
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
-    <div class="chat-container">
-        <header>
-            <h1>Drug RAG Assistant</h1>
-        </header>
+    <!-- Main Lamp Demo -->
+    <div class="lamp-container">
+        <div class="lamp-effect-wrapper">
+            <div class="lamp-beam-left" id="beamLeft"></div>
+            <div class="lamp-beam-right" id="beamRight"></div>
+            <div class="lamp-blur-bg"></div>
+            <div class="lamp-backdrop"></div>
+            <div class="lamp-glow-large"></div>
+            <div class="lamp-glow-medium" id="glowMedium"></div>
+            <div class="lamp-light-beam" id="lightBeam"></div>
+            <div class="lamp-mask"></div>
+        </div>
 
-        <div id="chat-box" class="chat-box"></div>
-
-        <form id="query-form" class="input-form">
-            <input type="text" id="query" placeholder="Ask about a drug..." required />
-            <button type="submit">Send</button>
-        </form>
+        <div class="lamp-content">
+            <h1 class="lamp-title" id="lampTitle">
+                Mednix <br> Drug Information BanK
+            </h1>
+        </div>
     </div>
 
+    <!-- Custom Colored Lamp -->
+    <div class="lamp-container custom-lamp">
+        <div class="lamp-effect-wrapper">
+            <div class="lamp-beam-left lamp-beam-custom"></div>
+            <div class="lamp-beam-right lamp-beam-custom"></div>
+            <div class="lamp-blur-bg"></div>
+            <div class="lamp-backdrop"></div>
+            <div class="lamp-glow-large"></div>
+            <div class="lamp-glow-medium lamp-glow-custom"></div>
+            <div class="lamp-light-beam lamp-light-custom"></div>
+            <div class="lamp-mask"></div>
+        </div>
+
+        <div class="lamp-content">
+            <h1 class="lamp-title lamp-title-custom">
+                Click to Chat
+            </h1>
+            <button id="chatButton" class="chat-button">Start Chatting</button>
+        </div>
+    </div>
+
+    <!-- Chat Section -->
+    <section id="chatSection" class="chat-section">
+        <div class="chat-container">
+            <div class="chat-header">
+                <h2>Mednix Drug Information Assistant</h2>
+                <p>Ask me anything about medications and their effects</p>
+            </div>
+            <div id="chatMessages" class="chat-messages">
+                <!-- Messages will be added here dynamically -->
+                <div class="message bot-message">
+                    Hello! I'm your Mednix assistant. How can I help you with medications today?
+                </div>
+            </div>
+            <div class="chat-input-container">
+                <input type="text" id="userInput" placeholder="Type your question about medications..." class="chat-input">
+                <button id="sendButton" class="send-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Load scripts at the end of body -->
+    <script>
+        // Initialize the chat UI when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize lamp animations
+            const lampContainers = document.querySelectorAll('.lamp-container');
+            lampContainers.forEach(container => {
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const container = entry.target;
+                            // Trigger animations with delays
+                            setTimeout(() => {
+                                const beams = container.querySelectorAll('.lamp-beam-left, .lamp-beam-right, .lamp-glow-medium, .lamp-light-beam');
+                                beams.forEach(beam => {
+                                    if (beam) beam.classList.add('animate');
+                                });
+                            }, 300);
+
+                            setTimeout(() => {
+                                const title = container.querySelector('.lamp-title');
+                                if (title) title.classList.add('animate');
+                            }, 600);
+                        }
+                    });
+                }, {
+                    threshold: 0.1,
+                    rootMargin: '0px 0px -50px 0px'
+                });
+                
+                observer.observe(container);
+                
+                // Immediately show the container
+                container.style.opacity = '1';
+            });
+
+            // Initialize chat functionality
+            if (document.getElementById('chatSection')) {
+                new ChatUI();
+            }
+        });
+    </script>
     <script src="/static/script.js"></script>
 </body>
 </html>
